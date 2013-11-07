@@ -1,5 +1,8 @@
 package com.missionse.arcticthunder;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -9,6 +12,7 @@ import android.view.Menu;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.map.MapsFragment;
+import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
@@ -21,6 +25,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	private MapsFragment mapsFragment;
 	private ModelViewerFragment modelViewerFragment;
+	private List<AssetObject> assets = new LinkedList<AssetObject>();
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -147,6 +152,14 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public boolean isAssetShown(final AssetType type) {
 		return mapsFragment.isAssetShown(type);
+	}
+	
+	public void createAsset(double lat, double log, AssetType type){
+		//TODO:
+	}
+	
+	public List<AssetObject> getAssetList(){
+		return assets;
 	}
 
 }

@@ -1,14 +1,18 @@
 package com.missionse.arcticthunder.augmented.setups;
 
 import geo.GeoObj;
+import gl.Color;
 import gl.GLCamera;
 import gl.GLFactory;
+import gl.GLRenderer;
 import gl.scenegraph.MeshComponent;
+import gl.scenegraph.Shape;
 import gui.GuiSetup;
 
 import java.util.List;
 
 import markerDetection.MarkerObjectMap;
+import util.Vec;
 import v2.simpleUi.util.IO;
 import worldData.Obj;
 import worldData.World;
@@ -22,7 +26,6 @@ import com.missionse.arcticthunder.model.AssetType;
 
 import commands.Command;
 import components.ProximitySensor;
-import de.rwth.R;
 
 public class WifiAssetsDefaultSetup extends DefaultSetup {
 	
@@ -62,15 +65,16 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 				world.add(o);
 			}else{
 				MeshComponent m = GLFactory.getInstance().newTexturedSquare(
-						"hippoId",
+						Integer.valueOf(asset.getUid()).toString(),
 						IO.loadBitmapFromId(getActivity(),
-								R.drawable.hippopotamus64));
+								asset.getType().getResourceId()));
 				
 				GeoObj o = new GeoObj();
 				o.setComp(o);
 				o.setMyLatitude(asset.getLatitude());
 				o.setMyLongitude(asset.getLongitude());
 					
+				world.add(o);
 			}
 		}
 	}
@@ -92,26 +96,27 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 						@Override
 						public boolean execute() {
 							logInfo("CREATING ENEMY MARK");
-//							Vec rayPosition = new Vec();
-//							Vec rayDirection = new Vec();
-//							getCamera().getPickingRay(rayPosition, rayDirection,
-//									GLRenderer.halfWidth, GLRenderer.halfHeight);
-//							
-//							System.out.println("rayPosition=" + rayPosition);
-//							System.out.println("rayDirection=" + rayDirection);
-//			
-//							rayDirection.setLength(5);
-//							// mesh1.setPosition(rayPosition.add(rayDirection));
-//							MeshComponent mesh4 = new Shape();
-//							mesh4.addChild(GLFactory.getInstance().newArrow());
-//			
-//							Obj o = new Obj();
-//							o.setComp(mesh4);
-//							getWorld().add(mesh4);
-//			
-//							mesh4.setPosition(rayPosition.add(rayDirection));
-//			
-//							mesh4.get
+							Vec rayPosition = new Vec();
+							Vec rayDirection = new Vec();
+							getCamera().getPickingRay(rayPosition, rayDirection,
+									GLRenderer.halfWidth, GLRenderer.halfHeight);
+							
+							System.out.println("rayPosition=" + rayPosition);
+							System.out.println("rayDirection=" + rayDirection);
+			
+							rayDirection.setLength(5);
+							// mesh1.setPosition(rayPosition.add(rayDirection));
+							MeshComponent mesh4 = new Shape();
+							mesh4.addChild(GLFactory.getInstance().newDiamond(Color.battleshipGrey()));
+			
+							GeoObj o = new GeoObj();
+							o.setComp(mesh4);
+							getWorld().add(mesh4);
+			
+							//o.setPosition(rayPosition.add(rayDirection));
+							o.setMyPosition(rayPosition.add(rayDirection));
+							
+							
 							
 							return false;
 						}
