@@ -28,6 +28,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
 import com.missionse.arcticthunder.augmented.setups.WifiAssetsDefaultSetup;
 import com.missionse.arcticthunder.camera.PictureFragment;
+import com.missionse.arcticthunder.imageviewer.ImageFragment;
 import com.missionse.arcticthunder.map.MapsFragment;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
@@ -63,6 +64,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	private ModelViewerFragment modelViewerFragment;
 	private List<AssetObject> assets = new LinkedList<AssetObject>();
 	private VideoFragment videoFragment;
+	private ImageFragment imageFragment;
 	private PictureFragment pictureFragment;
 
 	private PeerDetailFragment peerDetailFragment;
@@ -86,6 +88,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		modelViewerFragment.registerObjectLoadedListener(this);
 
 		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
+		imageFragment = new ImageFragment();
+
 		peerDetailFragment = new PeerDetailFragment();
 		peersListFragment = new PeersListFragment();
 
@@ -259,25 +263,24 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	 */
 
 	public void showMap() {
+		navigationDrawer.showContent();
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment).commit();
 	}
 
 	public void showAR() {
+		navigationDrawer.showContent();
 		WifiAssetsDefaultSetup s = new WifiAssetsDefaultSetup(this, getAssetList(), (OnWifiProximityListener) this);
 		ArActivity.startWithSetup(this, s);
 
 	}
 
-	public void showCamera() {
-		showWifiDirect();
-	}
-
 	public void showChat() {
-
+		navigationDrawer.showContent();
 	}
 
 	public void showModelViewer() {
+		navigationDrawer.showContent();
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).addToBackStack("ModelViewer")
 				.commit();
@@ -290,7 +293,10 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showPhoto() {
-
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content, imageFragment)
+			.addToBackStack("Image")
+			.commit();
 	}
 
 	/**

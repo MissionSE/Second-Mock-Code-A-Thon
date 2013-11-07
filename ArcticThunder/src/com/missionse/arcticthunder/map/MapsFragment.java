@@ -252,6 +252,8 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 				((ArcticThunderActivity) getActivity()).showVideo();
 			} else if (type.equals(AssetType.PHOTO)) {
 				((ArcticThunderActivity) getActivity()).showPhoto();
+			} else if (type.equals(AssetType.WIFI)) {
+				((ArcticThunderActivity) getActivity()).showWifiDirect();
 			}
 		}
 	}
