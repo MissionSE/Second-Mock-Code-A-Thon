@@ -23,46 +23,45 @@
 	    android:layout_weight="1" >
 	</ListView>
 	
-	
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true" >
+        <View
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true" >
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dip"
-                android:layout_marginLeft="4dip"
-                android:layout_marginRight="4dip"
-                android:background="?android:attr/dividerVertical"
-                android:layout_alignParentTop="true"/>
-            <View
-                android:id="@+id/vertical_button_divider"
-                android:layout_width="1dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="4dip"
-                android:layout_marginTop="4dip"
-                android:background="?android:attr/dividerVertical" 
-                android:layout_centerHorizontal="true"/>
-            <Button
-                android:id="@+id/show_all_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show All"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@id/vertical_button_divider" />
-            
-            <Button
-                android:id="@+id/hide_all_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hide All"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/vertical_button_divider" />
-        </RelativeLayout>
+            android:layout_height="1dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_alignParentTop="true"/>
+        <View
+            android:id="@+id/vertical_button_divider"
+            android:layout_width="1dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="4dip"
+            android:layout_marginTop="4dip"
+            android:background="?android:attr/dividerVertical" 
+            android:layout_centerHorizontal="true"/>
+        <Button
+            android:id="@+id/show_all_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show All"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/vertical_button_divider" />
+        
+        <Button
+            android:id="@+id/hide_all_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide All"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/vertical_button_divider" />
+    </RelativeLayout>
 </LinearLayout>

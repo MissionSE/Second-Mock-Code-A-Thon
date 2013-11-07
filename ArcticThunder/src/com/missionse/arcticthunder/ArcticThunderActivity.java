@@ -19,6 +19,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
@@ -41,6 +42,8 @@ import com.missionse.arcticthunder.wifidirect.connector.DisconnectionListener;
 import com.missionse.arcticthunder.wifidirect.connector.DiscoverPeersListener;
 import com.missionse.arcticthunder.wifidirect.connector.P2pStateChangeHandler;
 import com.missionse.arcticthunder.wifidirect.connector.WifiDirectConnector;
+import com.missionse.arcticthunder.wifidirect.network.Client;
+import com.missionse.arcticthunder.wifidirect.network.Server;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
 	
@@ -60,14 +63,16 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	private PeerDetailFragment peerDetailFragment;
 	private PeersListFragment peersListFragment;
-	//private ModelControllerClient modelClient;
-	//private ModelControllerServer modelServer;
+	private Client client;
+	private Server server;
 	private WifiP2pDevice targetDevice;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		client = new Client(this);
 
 		wifiDirectConnector.onCreate(this);
 
@@ -130,7 +135,9 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 			@Override
 			public void onPeersAvailable(final WifiP2pDeviceList peers) {
 				// Peer discovery has finished, and we have a list of peers.
-				peersListFragment.setAvailablePeers(peers);
+				if (peersListFragment.isResumed()) {
+					peersListFragment.setAvailablePeers(peers);
+				}
 
 				// If we got a list of 0 peers, we've either disconnected, or there are no peers to be found after
 				// the timeout.
@@ -143,6 +150,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 					fragmentManager.beginTransaction().replace(R.id.content, peersListFragment).commit();
 
 					fragmentManager.executePendingTransactions();
+
+					peersListFragment.refresh();
 				}
 			}
 
@@ -151,13 +160,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 				// We have made a connection, and the PeerDetail fragment should receive the connection information.
 				peerDetailFragment.setConnectionSuccessfulInformation(connectionInfo);
 
+				if (peerDetailFragment.isResumed()) {
+					peerDetailFragment.refresh();
+				}
+
+				Log.e("something", "client saving connect info and device");
+				client.setConnectionSuccessful(connectionInfo, targetDevice);
+
+				// Start the server thread to listen for incoming changes.				
+				server = new Server();
+				server.execute(ArcticThunderActivity.this);
+
 				showToast("Connection successful.");
-
-				// Start the server thread to listen for incoming model state changes.
-				//modelServer = new ModelControllerServer();
-				//modelServer.execute(modelFragment);
-
-				//modelClient.onConnectionSuccessful(connectionInfo, targetDevice);
 			}
 
 			@Override
@@ -193,11 +207,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showAR() {
-		WifiAssetsDefaultSetup s =
-				new WifiAssetsDefaultSetup(
-						this,
-						getAssetList(),
-						(OnWifiProximityListener)this);
+		WifiAssetsDefaultSetup s = new WifiAssetsDefaultSetup(this, getAssetList(), (OnWifiProximityListener) this);
 		ArActivity.startWithSetup(this, s);
 
 	}
@@ -207,8 +217,6 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showChat() {
-		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
 
 	}
 
@@ -254,7 +262,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void sendDataOverWifi() {
-
+		Log.e("somthing", "trying to send data");
+		client.sendChanges("some data here");
 	}
 
 	public void connect() {
@@ -287,10 +296,10 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 				//peerDetailFragment.refresh();
 
 				// On disconnect, stop the client from sending, and shut down the server thread.
-				//modelClient.onDisconnect();
+				client.onDisconnect();
 
-				//modelServer.cancel(true);
-				//modelServer = null;
+				server.cancel(true);
+				server = null;
 
 				targetDevice = null;
 			}
@@ -305,6 +314,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	public void showPeerDetails(final WifiP2pDevice device) {
 		// This is called by the PeerList fragment, when an item is selected. Save off the target device for
 		// the server connection, give it to the PeerDetail fragment, and switch the ViewPager automatically.
+		Log.e("something", "saving peer detail");
 		targetDevice = device;
 		peerDetailFragment.setTargetDevice(device);
 
@@ -315,6 +325,11 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		fragmentManager.executePendingTransactions();
 
 		peerDetailFragment.refresh();
+	}
+
+	public void processReceivedData(final String receivedData) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
