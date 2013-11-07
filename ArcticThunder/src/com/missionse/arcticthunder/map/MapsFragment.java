@@ -1,9 +1,13 @@
 package com.missionse.arcticthunder.map;
 
 import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID;
+
+import java.util.ArrayList;
+
 import android.app.Fragment;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,19 +21,24 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.missionse.arcticthunder.R;
+import com.missionse.arcticthunder.model.AssetObject;
 
 public class MapsFragment extends Fragment implements ConnectionCallbacks, OnConnectionFailedListener,
-LocationListener, OnMyLocationButtonClickListener {
+LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener {
 
 	private static final LatLng MSE = new LatLng(39.974552, -74.976844);
 	private static final LatLng ZONE_A = new LatLng(39.974074, -74.977462);
 	private static final LatLng ZONE_B = new LatLng(39.975233, -74.977328);
 	private static final LatLng ZONE_C = new LatLng(39.975085, -74.976164);
+
+	private ArrayList<AssetObject> assets;
 
 	private GoogleMap mMap;
 
@@ -42,6 +51,10 @@ LocationListener, OnMyLocationButtonClickListener {
 	private static final LocationRequest REQUEST = LocationRequest.create().setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+	public MapsFragment() {
+		assets = new ArrayList<AssetObject>();
+	}
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -130,7 +143,23 @@ LocationListener, OnMyLocationButtonClickListener {
 	private void setUpMap() {
 		mMap.setMyLocationEnabled(true);
 		mMap.setOnMyLocationButtonClickListener(this);
+		mMap.setOnMapClickListener(this);
+		mMap.setOnMapLongClickListener(this);
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
+	}
+
+	@Override
+	public void onMapLongClick(final LatLng point) {
+		Log.e("MapsFragment", "onMapLongClick: " + point);
+	}
+
+	@Override
+	public void onMapClick(final LatLng point) {
+		Log.e("MapsFragment", "onMapClick: " + point);
+	}
+
+	public void showEnemyAssets() {
+
 	}
 }
