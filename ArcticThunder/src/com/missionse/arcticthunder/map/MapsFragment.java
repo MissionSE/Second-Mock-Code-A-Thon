@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.missionse.arcticthunder.R;
 import com.missionse.arcticthunder.model.AssetObject;
+import com.missionse.arcticthunder.model.AssetType;
 
 public class MapsFragment extends Fragment implements ConnectionCallbacks, OnConnectionFailedListener,
 LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener {
@@ -159,7 +160,11 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		Log.e("MapsFragment", "onMapClick: " + point);
 	}
 
-	public void showEnemyAssets() {
+	public void setAssetShown(final AssetType type, final boolean visible) {
 
+	}
+
+	public boolean isAssetShown(final AssetType type) {
+		return false;
 	}
 }
