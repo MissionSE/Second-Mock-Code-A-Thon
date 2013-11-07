@@ -38,7 +38,7 @@ import com.missionse.arcticthunder.wifidirect.connector.DiscoverPeersListener;
 import com.missionse.arcticthunder.wifidirect.connector.P2pStateChangeHandler;
 import com.missionse.arcticthunder.wifidirect.connector.WifiDirectConnector;
 
-public class ArcticThunderActivity extends Activity implements ObjectLoadedListener {
+public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
 
 	private final WifiDirectConnector wifiDirectConnector = new WifiDirectConnector();
 
@@ -356,6 +356,12 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	private void showToast(final String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onWifiProximityReached(Activity activity) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
