@@ -3,7 +3,7 @@ package com.missionse.arcticthunder;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,7 +19,7 @@ import android.widget.ListView;
 
 import com.missionse.arcticthunder.model.AssetType;
 
-public class FilterDrawerFragment extends ListFragment {
+public class FilterDrawerFragment extends Fragment {
 
 	private final List<String> menuItems = new ArrayList<String>();
 	private ListView listView;
@@ -51,7 +51,7 @@ public class FilterDrawerFragment extends ListFragment {
 		menuItems.add("HOTSPOTS");
 		menuItems.add("POSSIBLE THREATS");
 
-		setListAdapter(new FilterAdapter(getActivity(), R.layout.filter_drawer_item, menuItems));
+		listView.setAdapter(new FilterAdapter(getActivity(), R.layout.filter_drawer_item, menuItems));
 	}
 
 	public void onCheckboxStateChange(final String item, final boolean isChecked) {
@@ -94,7 +94,7 @@ public class FilterDrawerFragment extends ListFragment {
 
 	private void updateCheckboxes(final ArcticThunderActivity activity) {
 		for (int index = 0; index < menuItems.size(); index++) {
-			String item = (String) getListAdapter().getItem(index);
+			String item = (String) listView.getAdapter().getItem(index);
 			if (item.equals("Enemy Vehicles")) {
 				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
 			} else if (item.equals("Enemy Buildings")) {
