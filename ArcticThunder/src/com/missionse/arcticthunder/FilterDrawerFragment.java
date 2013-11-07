@@ -1,6 +1,7 @@
 package com.missionse.arcticthunder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Fragment;
@@ -23,6 +24,7 @@ public class FilterDrawerFragment extends Fragment {
 
 	private final List<String> menuItems = new ArrayList<String>();
 	private ListView listView;
+	private HashMap<String, CheckBox> checkboxes = new HashMap<String, CheckBox>();
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class FilterDrawerFragment extends Fragment {
 	}
 
 	private void createMenu() {
+		menuItems.add("FRIENDS");
 		menuItems.add("ENEMY ASSETS");
 		menuItems.add("Enemy Vehicles");
 		menuItems.add("Enemy Buildings");
@@ -57,7 +60,9 @@ public class FilterDrawerFragment extends Fragment {
 	public void onCheckboxStateChange(final String item, final boolean isChecked) {
 		ArcticThunderActivity activity = (ArcticThunderActivity) getActivity();
 
-		if (item.equals("ENEMY ASSETS")) {
+		if (item.equals("FRIENDS")) {
+			activity.setAssetShown(AssetType.FRIEND, isChecked);
+		} else if (item.equals("ENEMY ASSETS")) {
 			activity.setAssetShown(AssetType.ENEMY_BUILDING, isChecked);
 			activity.setAssetShown(AssetType.ENEMY_ROAMING_TROOP, isChecked);
 			activity.setAssetShown(AssetType.ENEMY_VEHICLE, isChecked);
@@ -96,20 +101,19 @@ public class FilterDrawerFragment extends Fragment {
 		for (int index = 0; index < menuItems.size(); index++) {
 			String item = (String) listView.getAdapter().getItem(index);
 			if (item.equals("Enemy Vehicles")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
 			} else if (item.equals("Enemy Buildings")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_BUILDING));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_BUILDING));
 			} else if (item.equals("Enemy Watch Stands")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_WATCH_STAND));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_WATCH_STAND));
 			} else if (item.equals("Roaming Troops")) {
-				((CheckBox) listView.getChildAt(index))
-						.setChecked(activity.isAssetShown(AssetType.ENEMY_ROAMING_TROOP));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_ROAMING_TROOP));
 			} else if (item.equals("Church")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_CHURCH));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_CHURCH));
 			} else if (item.equals("Schools")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
 			} else if (item.equals("Malls")) {
-				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
+				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_MALL));
 			}
 		}
 
@@ -143,29 +147,30 @@ public class FilterDrawerFragment extends Fragment {
 				leftPadding.setMargins(30, 0, 0, 0);
 
 				if (icon != null && text != null) {
-					if (item.equals("ENEMY ASSETS")) {
+					if (item.equals("FRIENDS")) {
+						icon.setImageResource(R.drawable.friendly_icon);
+					} else if (item.equals("ENEMY ASSETS")) {
 						icon.setVisibility(View.GONE);
 					} else if (item.equals("Enemy Vehicles")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.enemy_icon);
 					} else if (item.equals("Enemy Buildings")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.enemy_icon);
 					} else if (item.equals("Enemy Watch Stands")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.enemy_icon);
 					} else if (item.equals("Roaming Troops")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.enemy_icon);
 					} else if (item.equals("TOWN ASSETS")) {
 						icon.setVisibility(View.GONE);
-						icon.setImageResource(R.drawable.ic_launcher);
 					} else if (item.equals("Church")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.church_icon);
 					} else if (item.equals("Schools")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.school_icon);
 					} else if (item.equals("Malls")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.mall_icon);
 					} else if (item.equals("PHOTOS/VIDEOS")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.camera_icon);
 					} else if (item.equals("HOTSPOTS")) {
-						icon.setImageResource(R.drawable.ic_launcher);
+						icon.setImageResource(R.drawable.wifi_icon);
 					} else if (item.equals("POSSIBLE THREATS")) {
 						icon.setImageResource(R.drawable.ic_launcher);
 					}
@@ -176,6 +181,8 @@ public class FilterDrawerFragment extends Fragment {
 							FilterDrawerFragment.this.onCheckboxStateChange(buttonView.getText().toString(), isChecked);
 						}
 					});
+
+					checkboxes.put(item, text);
 				}
 			}
 			return convertView;

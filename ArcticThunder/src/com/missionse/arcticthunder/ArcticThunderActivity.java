@@ -46,7 +46,7 @@ import com.missionse.arcticthunder.wifidirect.network.Client;
 import com.missionse.arcticthunder.wifidirect.network.Server;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
-	
+
 	static final int TAKE_SECURITY_PICTURE = 1234;
 
 
@@ -83,7 +83,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
 		peerDetailFragment = new PeerDetailFragment();
 		peersListFragment = new PeersListFragment();
-		
+
 		pictureFragment = new PictureFragment();
 
 		createNavigationMenu();
@@ -167,7 +167,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 				Log.e("something", "client saving connect info and device");
 				client.setConnectionSuccessful(connectionInfo, targetDevice);
 
-				// Start the server thread to listen for incoming changes.				
+				// Start the server thread to listen for incoming changes.
 				server = new Server();
 				server.execute(ArcticThunderActivity.this);
 
@@ -222,12 +222,20 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showModelViewer() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment)
+			.addToBackStack("ModelViewer")
+			.commit();
 	}
 
 	public void showVideo() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, videoFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, videoFragment)
+			.addToBackStack("Video")
+			.commit();
+
+	}
+
+	public void showPhoto() {
 
 	}
 
@@ -388,7 +396,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		// Check which request we're responding to
@@ -412,6 +420,6 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		}
 	}
 
-	
+
 
 }
