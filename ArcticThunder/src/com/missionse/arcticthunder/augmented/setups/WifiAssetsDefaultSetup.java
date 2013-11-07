@@ -19,6 +19,7 @@ import worldData.World;
 import android.app.Activity;
 import android.util.Log;
 
+import com.missionse.arcticthunder.ArcticThunderActivity;
 import com.missionse.arcticthunder.augmented.components.MeshComponentFactory;
 import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
 import com.missionse.arcticthunder.model.AssetObject;
@@ -31,11 +32,13 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 	
 	private List<AssetObject> defaultAssets;
 	private OnWifiProximityListener[] listeners;
+	private ArcticThunderActivity parentActivity;
 	
-	public WifiAssetsDefaultSetup(List<AssetObject> assets, OnWifiProximityListener... l){
+	public WifiAssetsDefaultSetup(ArcticThunderActivity a, List<AssetObject> assets, OnWifiProximityListener... l){
 		super(true);
 		defaultAssets = assets;
 		listeners = l;
+		parentActivity = a;
 	}
 
 	@Override
@@ -116,7 +119,9 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 							//o.setPosition(rayPosition.add(rayDirection));
 							o.setMyPosition(rayPosition.add(rayDirection));
 							
-							
+							logInfo("Creating new mark at " + o.getLatitude() + " / " + o.getLongitude());
+							if(parentActivity != null)
+								parentActivity.createAsset(o.getLatitude(), o.getLongitude());
 							
 							return false;
 						}
