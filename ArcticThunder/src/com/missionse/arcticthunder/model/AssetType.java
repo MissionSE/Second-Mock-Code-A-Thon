@@ -53,4 +53,13 @@ public enum AssetType {
 	public String toString() {
 		return text;
 	}
+	
+	public static CharSequence[] valuesAsCharSequence() {
+		CharSequence[] value = new CharSequence[values().length];
+		AssetType[] types = values();
+		for (int i = 0; i < types.length; i++) {
+			value[i] = types[i].toString();
+		}
+		return value;
+	}
 }
