@@ -25,9 +25,12 @@ import worldData.Obj;
 import worldData.SystemUpdater;
 import worldData.World;
 import actions.Action;
+import actions.ActionCalcRelativePos;
 import actions.ActionMoveCameraBuffered;
 import actions.ActionRotateCameraBuffered;
+import actions.ActionWaitForAccuracy;
 import android.app.Activity;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Button;
 
@@ -45,6 +48,8 @@ public class MultiMarkerSetup extends MarkerDetectionSetup {
 	private Thread worldUpdateThread;
 	private volatile boolean runThread = false;
 	private List<OnWorldUpdateListener> listeners = new LinkedList<OnWorldUpdateListener>();
+	private ActionWaitForAccuracy minAccuracyAction;
+	private ActionRotateCameraBuffered rotateGLCameraAction;
 	
 	public MultiMarkerSetup(){
 		this(true);
@@ -292,7 +297,7 @@ public class MultiMarkerSetup extends MarkerDetectionSetup {
 	}
 
 	@Override
-	public void _c_addActionsToEvents(EventManager eventManager,
+	public void _c_addActionsToEvents(final EventManager eventManager,
 			CustomGLSurfaceView arView, SystemUpdater updater) {
 		arView.addOnTouchMoveListener(new ActionMoveCameraBuffered(camera, 5,
 				25));
@@ -301,12 +306,31 @@ public class MultiMarkerSetup extends MarkerDetectionSetup {
 		eventManager.addOnOrientationChangedAction(rot);
 		eventManager.addOnTrackballAction(new ActionMoveCameraBuffered(camera,
 				1, 25));
+		eventManager.addOnLocationChangedAction(new ActionCalcRelativePos(
+				world, camera));
+		minAccuracyAction = new ActionWaitForAccuracy(getActivity(), 26.0f, 10) {
+			@Override
+			public void minAccuracyReachedFirstTime(Location l,
+					ActionWaitForAccuracy a) {
+				//callAddObjectsToWorldIfNotCalledAlready();
+				world.clear();
+				_y_addDefaultObjects(world);
+				if (!eventManager.getOnLocationChangedAction().remove(a)) {
+					Log.e("MULIT_SETUP",
+							"Could not remove minAccuracyAction from the onLocationChangedAction list");
+				}
+			}
+		};
+		eventManager.addOnLocationChangedAction(minAccuracyAction);
+		rotateGLCameraAction = new ActionRotateCameraBuffered(camera);
+		eventManager.addOnOrientationChangedAction(rotateGLCameraAction);
 
 	}
 
 	@Override
 	public void _d_addElementsToUpdateThread(SystemUpdater updater) {
 		updater.addObjectToUpdateCycle(world);
+		updater.addObjectToUpdateCycle(rotateGLCameraAction);
 
 	}
 
@@ -340,6 +364,7 @@ public class MultiMarkerSetup extends MarkerDetectionSetup {
 //				return false;
 //			}
 //		}, "Place 2 meters infront");
+		guiSetup.addViewToTop(minAccuracyAction.getView());
 		
 		_e3_addElementsToUi(guiSetup, activity);
 	}

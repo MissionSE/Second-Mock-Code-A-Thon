@@ -62,11 +62,11 @@ public class MeshComponentFactory {
 	
 	public static MeshComponent createArrowWithCircle(){
 		MeshComponent arrow = GLFactory.getInstance().newArrow();
-		arrow.setPosition(new Vec(0, 0, 5));
+		arrow.setPosition(new Vec(0, 0, 7));
 
 		MeshComponent circle = GLFactory.getInstance().newCircle(
 				Color.redTransparent());
-		circle.setScale(new Vec(4, 4, 4));
+		circle.setScale(new Vec(7, 7, 5));
 
 		final MeshComponent itemMesh = new Shape();
 		itemMesh.addChild(arrow);

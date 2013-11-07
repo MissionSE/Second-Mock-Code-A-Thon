@@ -54,6 +54,8 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 				o.setComp(m);
 				o.setMyLatitude(asset.getLatitude());
 				o.setMyLongitude(asset.getLongitude());
+				
+				world.add(o);
 			}
 		}
 	}
