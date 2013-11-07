@@ -73,7 +73,7 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 								asset.getType().getResourceId()));
 				
 				GeoObj o = new GeoObj();
-				o.setComp(o);
+				o.setComp(m);
 				o.setMyLatitude(asset.getLatitude());
 				o.setMyLongitude(asset.getLongitude());
 					
@@ -99,26 +99,27 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 						@Override
 						public boolean execute() {
 							logInfo("CREATING ENEMY MARK");
-							Vec rayPosition = new Vec();
-							Vec rayDirection = new Vec();
-							getCamera().getPickingRay(rayPosition, rayDirection,
-									GLRenderer.halfWidth, GLRenderer.halfHeight);
-							
-							System.out.println("rayPosition=" + rayPosition);
-							System.out.println("rayDirection=" + rayDirection);
-			
-							rayDirection.setLength(5);
-							// mesh1.setPosition(rayPosition.add(rayDirection));
-							MeshComponent mesh4 = new Shape();
-							mesh4.addChild(GLFactory.getInstance().newDiamond(Color.battleshipGrey()));
-			
+//							Vec rayPosition = new Vec();
+//							Vec rayDirection = new Vec();
+//							getCamera().getPickingRay(rayPosition, rayDirection,
+//									GLRenderer.halfWidth, GLRenderer.halfHeight);
+//							
+//							System.out.println("rayPosition=" + rayPosition);
+//							Systet.println("rayDirection=" + rayDirection);
+//			
+//							rayDirection.setLength(5);
+//							// mesh1.setPosition(rayPosition.add(rayDirection));
+//							MeshComponent mesh4 = new Shape();
+//							mesh4.addChild(GLFactory.getInstance().newDiamond(Color.battleshipGrey()));
+//			
 							GeoObj o = new GeoObj();
-							o.setComp(mesh4);
-							//getWorld().add(mesh4);
-			
-							//o.setPosition(rayPosition.add(rayDirection));
-							o.setMyPosition(rayPosition.add(rayDirection));
-							
+//							o.setComp(mesh4);
+//							//getWorld().add(mesh4);
+//			
+//							//o.setPosition(rayPosition.add(rayDirection));
+//							o.setMyPosition(rayPosition.add(rayDirection));
+							o.setMyLatitude(getCamera().getGPSLocation().getLatitude());
+							o.setMyLongitude(getCamera().getGPSLocation().getLongitude());
 							logInfo("Creating new mark at " + o.getLatitude() + " / " + o.getLongitude());
 							if(parentActivity != null)
 								parentActivity.createAsset(o.getLatitude(), o.getLongitude(),getActivity());

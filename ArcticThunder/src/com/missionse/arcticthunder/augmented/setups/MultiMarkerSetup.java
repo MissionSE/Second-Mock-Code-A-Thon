@@ -313,7 +313,11 @@ public class MultiMarkerSetup extends MarkerDetectionSetup {
 			public void minAccuracyReachedFirstTime(Location l,
 					ActionWaitForAccuracy a) {
 				//callAddObjectsToWorldIfNotCalledAlready();
-				world.clear();
+				if(world.getAllItems() == null){
+					Obj o = new Obj();
+					o.setPosition(new Vec());
+					world.add(o);
+				}
 				_y_addDefaultObjects(world);
 				if (!eventManager.getOnLocationChangedAction().remove(a)) {
 					Log.e("MULIT_SETUP",
