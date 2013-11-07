@@ -51,7 +51,7 @@ import com.missionse.arcticthunder.wifidirect.network.Server;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
 
-	private static int NFC_COUNT = 0;
+	public static int NFC_COUNT = 0;
 
 	static final int TAKE_SECURITY_PICTURE = 1234;
 
@@ -546,37 +546,6 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		asset = new AssetObject(39.9757139, -74.977589, AssetType.WIFI);
 		assets.add(asset);
 		mapsFragment.addAsset(asset);
-	}
-
-	public void createSpyAssets(final int index) {
-		AssetObject asset;
-
-		switch (index) {
-			case 1:
-				asset = new AssetObject(39.973806, -74.979490, AssetType.ENEMY_WATCH_STAND);
-				assets.add(asset);
-				mapsFragment.addAsset(asset);
-
-				asset = new AssetObject(39.973181, -74.980155, AssetType.ENEMY_VEHICLE);
-				assets.add(asset);
-				mapsFragment.addAsset(asset);
-
-				asset = new AssetObject(39.971786, -74.978396, AssetType.ENEMY_BUILDING);
-				assets.add(asset);
-				mapsFragment.addAsset(asset);
-
-				break;
-			case 2:
-				asset = new AssetObject(39.973342, -74.975182, AssetType.ENEMY_BUILDING);
-				assets.add(asset);
-				mapsFragment.addAsset(asset);
-
-				asset = new AssetObject(39.973342, -74.975182, AssetType.ENEMY_ROAMING_TROOP);
-				assets.add(asset);
-				mapsFragment.addAsset(asset);
-
-				break;
-		}
 	}
 
 }

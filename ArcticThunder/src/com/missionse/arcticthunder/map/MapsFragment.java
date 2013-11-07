@@ -198,6 +198,32 @@ public class MapsFragment extends Fragment implements ConnectionCallbacks, OnCon
 		}
 	}
 
+	public void createSpyAssets(final int index) {
+		AssetObject asset;
+
+		switch (index) {
+			case 1:
+				asset = new AssetObject(39.973806, -74.979490, AssetType.ENEMY_WATCH_STAND);
+				addAsset(asset);
+
+				asset = new AssetObject(39.973181, -74.980155, AssetType.ENEMY_VEHICLE);
+				addAsset(asset);
+
+				asset = new AssetObject(39.971786, -74.978396, AssetType.ENEMY_BUILDING);
+				addAsset(asset);
+
+				break;
+			case 2:
+				asset = new AssetObject(39.973342, -74.975182, AssetType.ENEMY_BUILDING);
+				addAsset(asset);
+
+				asset = new AssetObject(39.973342, -74.975182, AssetType.ENEMY_ROAMING_TROOP);
+				addAsset(asset);
+
+				break;
+		}
+	}
+
 	private void setUpMap() {
 		mMap.setMyLocationEnabled(true);
 		mMap.setOnMyLocationButtonClickListener(this);
@@ -207,6 +233,12 @@ public class MapsFragment extends Fragment implements ConnectionCallbacks, OnCon
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
 		((ArcticThunderActivity) getActivity()).createWifiAssets();
+		if (((ArcticThunderActivity) getActivity()).NFC_COUNT == 1) {
+			createSpyAssets(1);
+		}
+		if (((ArcticThunderActivity) getActivity()).NFC_COUNT == 2) {
+			createSpyAssets(2);
+		}
 		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 		for (AssetType type : AssetType.values()) {
 			mAssetTypeVisibility.put(type, true);
