@@ -13,6 +13,8 @@ import com.missionse.arcticthunder.model.AssetType;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
 import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
+import com.missionse.arcticthunder.videoviewer.VideoFragment;
+import com.missionse.arcticthunder.videoviewer.VideoFragmentFactory;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener {
 
@@ -21,6 +23,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	private MapsFragment mapsFragment;
 	private ModelViewerFragment modelViewerFragment;
+	private VideoFragment videoFragment;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -30,6 +33,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		mapsFragment = new MapsFragment();
 		modelViewerFragment = ModelViewerFragmentFactory.createObjModelFragment(R.raw.lobby_obj);
 		modelViewerFragment.registerObjectLoadedListener(this);
+
+		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
 
 		createNavigationMenu();
 
@@ -112,6 +117,12 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	public void showModelViewer() {
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+	}
+
+	public void showVideo() {
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content, videoFragment).commit();
+
 	}
 
 	/**
