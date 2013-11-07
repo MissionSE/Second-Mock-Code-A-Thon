@@ -1,22 +1,20 @@
 package com.missionse.arcticthunder.augmented.setups;
 
 import geo.GeoObj;
-import gl.Color;
 import gl.GLCamera;
 import gl.GLFactory;
-import gl.GLRenderer;
 import gl.scenegraph.MeshComponent;
-import gl.scenegraph.Shape;
 import gui.GuiSetup;
 
 import java.util.List;
 
 import markerDetection.MarkerObjectMap;
-import util.Vec;
 import v2.simpleUi.util.IO;
 import worldData.Obj;
 import worldData.World;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.missionse.arcticthunder.ArcticThunderActivity;
@@ -24,7 +22,6 @@ import com.missionse.arcticthunder.augmented.components.MeshComponentFactory;
 import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
-
 import commands.Command;
 import components.ProximitySensor;
 
@@ -61,16 +58,20 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 						notifyWifiProxyListeners();
 					}
 				});
+				
 				o.setComp(m);
 				o.setMyLatitude(asset.getLatitude());
 				o.setMyLongitude(asset.getLongitude());
 				
 				world.add(o);
 			}else{
+				Bitmap b = IO.loadBitmapFromId(getActivity(), asset.getType().getResourceId());
+				Bitmap scaled = createScaledBitmap(b, 5, true);
+				b.recycle();
 				MeshComponent m = GLFactory.getInstance().newTexturedSquare(
 						Integer.valueOf(asset.getUid()).toString(),
-						IO.loadBitmapFromId(getActivity(),
-								asset.getType().getResourceId()));
+						scaled,
+						asset.getType().getResourceId());
 				
 				GeoObj o = new GeoObj();
 				o.setComp(m);
@@ -80,6 +81,14 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 				world.add(o);
 			}
 		}
+	}
+	
+	
+	 public static Bitmap createScaledBitmap(Bitmap src, float scale, boolean filtering)
+	 {
+		    int width = (int)( src.getWidth() * scale + 0.5f);
+		    int height = (int)( src.getHeight() * scale + 0.5f);
+		    return Bitmap.createScaledBitmap(src, width, height, filtering);
 	}
 	
 	public void notifyWifiProxyListeners(){
