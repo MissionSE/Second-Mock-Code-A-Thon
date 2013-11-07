@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -33,6 +34,8 @@ import com.missionse.arcticthunder.model.AssetType;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
 import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
+import com.missionse.arcticthunder.nfc.NfcConnectionListener;
+import com.missionse.arcticthunder.nfc.NfcConnector;
 import com.missionse.arcticthunder.videoviewer.VideoFragment;
 import com.missionse.arcticthunder.videoviewer.VideoFragmentFactory;
 import com.missionse.arcticthunder.wifidirect.PeerDetailFragment;
@@ -46,11 +49,12 @@ import com.missionse.arcticthunder.wifidirect.network.Client;
 import com.missionse.arcticthunder.wifidirect.network.Server;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
-
 	static final int TAKE_SECURITY_PICTURE = 1234;
 
-
 	private final WifiDirectConnector wifiDirectConnector = new WifiDirectConnector();
+	private final NfcConnector nfcConnector = new NfcConnector();
+
+	public static boolean COMMANDER_MODE = false;
 
 	private SlidingMenu navigationDrawer;
 	private SlidingMenu filterDrawer;
@@ -75,6 +79,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		client = new Client(this);
 
 		wifiDirectConnector.onCreate(this);
+		nfcConnector.onCreate(this);
 
 		mapsFragment = new MapsFragment();
 		modelViewerFragment = ModelViewerFragmentFactory.createObjModelFragment(R.raw.lobby_obj);
@@ -91,6 +96,28 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		createFilterMenu();
 
 		showMap();
+	}
+
+	@Override
+	public void onNewIntent(final Intent intent) {
+		Log.e("something", "got nfc");
+		setIntent(intent);
+		NfcConnector.parseIntent(getIntent(), new NfcConnectionListener() {
+			@Override
+			public void onNfcConnection() {
+				Log.e("something", "got nfc");
+
+				ArcticThunderActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						showToast("saw NFC");
+					}
+
+				});
+
+			}
+		});
 	}
 
 	private void createNavigationMenu() {
@@ -130,6 +157,24 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		NfcConnector.parseIntent(getIntent(), new NfcConnectionListener() {
+			@Override
+			public void onNfcConnection() {
+				Log.e("something", "got nfc");
+
+				ArcticThunderActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						showToast("saw NFC");
+					}
+
+				});
+
+			}
+		});
+
 		wifiDirectConnector.onResume(this);
 		wifiDirectConnector.addStateChangeHandler(new P2pStateChangeHandler() {
 			@Override
@@ -197,6 +242,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_commander_mode:
+				item.setChecked(!item.isChecked());
+				COMMANDER_MODE = item.isChecked();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
 	/**
 	 * HOOKS FROM MENUS
 	 */
@@ -222,16 +279,13 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showModelViewer() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment)
-			.addToBackStack("ModelViewer")
-			.commit();
+		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).addToBackStack("ModelViewer")
+				.commit();
 	}
 
 	public void showVideo() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, videoFragment)
-			.addToBackStack("Video")
-			.commit();
+		fragmentManager.beginTransaction().replace(R.id.content, videoFragment).addToBackStack("Video").commit();
 
 	}
 
@@ -373,7 +427,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 						AssetObject asset = new AssetObject(lat, log, assetType);
 						assets.add(asset);
 						mapsFragment.addAsset(asset);
-						if(assetType == AssetType.PHOTO){
+						if (assetType == AssetType.PHOTO) {
 							Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 							startActivityForResult(takePictureIntent, TAKE_SECURITY_PICTURE);
 						}
@@ -419,7 +473,4 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 			}
 		}
 	}
-
-
-
 }
