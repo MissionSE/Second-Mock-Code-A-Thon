@@ -92,6 +92,8 @@ public class FilterDrawerFragment extends Fragment {
 			activity.setAssetShown(AssetType.WIFI, isChecked);
 		} else if (item.equals("POSSIBLE THREATS")) {
 			activity.setAssetShown(AssetType.POSSIBLE_THREAT, isChecked);
+		} else if (item.equals("POSSIBLE THREATS")) {
+			activity.setAssetShown(AssetType.POSSIBLE_THREAT, isChecked);
 		}
 
 		updateCheckboxes(activity);
@@ -100,20 +102,23 @@ public class FilterDrawerFragment extends Fragment {
 	private void updateCheckboxes(final ArcticThunderActivity activity) {
 		for (int index = 0; index < menuItems.size(); index++) {
 			String item = (String) listView.getAdapter().getItem(index);
-			if (item.equals("Enemy Vehicles")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
-			} else if (item.equals("Enemy Buildings")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_BUILDING));
-			} else if (item.equals("Enemy Watch Stands")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_WATCH_STAND));
-			} else if (item.equals("Roaming Troops")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_ROAMING_TROOP));
-			} else if (item.equals("Church")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_CHURCH));
-			} else if (item.equals("Schools")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
-			} else if (item.equals("Malls")) {
-				checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_MALL));
+
+			if (checkboxes.get(item) != null) {
+				if (item.equals("Enemy Vehicles")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
+				} else if (item.equals("Enemy Buildings")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_BUILDING));
+				} else if (item.equals("Enemy Watch Stands")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_WATCH_STAND));
+				} else if (item.equals("Roaming Troops")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.ENEMY_ROAMING_TROOP));
+				} else if (item.equals("Church")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_CHURCH));
+				} else if (item.equals("Schools")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
+				} else if (item.equals("Malls")) {
+					checkboxes.get(item).setChecked(activity.isAssetShown(AssetType.TOWN_MALL));
+				}
 			}
 		}
 
