@@ -45,10 +45,10 @@ import com.missionse.arcticthunder.wifidirect.connector.WifiDirectConnector;
 import com.missionse.arcticthunder.wifidirect.network.Client;
 import com.missionse.arcticthunder.wifidirect.network.Server;
 
-public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
-	
-	static final int TAKE_SECURITY_PICTURE = 1234;
+public class ArcticThunderActivity extends Activity implements
+		ObjectLoadedListener, OnWifiProximityListener {
 
+	static final int TAKE_SECURITY_PICTURE = 1234;
 
 	private final WifiDirectConnector wifiDirectConnector = new WifiDirectConnector();
 
@@ -66,6 +66,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	private Client client;
 	private Server server;
 	private WifiP2pDevice targetDevice;
+	private boolean populate = false;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -77,20 +78,24 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		wifiDirectConnector.onCreate(this);
 
 		mapsFragment = new MapsFragment();
-		modelViewerFragment = ModelViewerFragmentFactory.createObjModelFragment(R.raw.lobby_obj);
+		modelViewerFragment = ModelViewerFragmentFactory
+				.createObjModelFragment(R.raw.lobby_obj);
 		modelViewerFragment.registerObjectLoadedListener(this);
 
-		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
+		videoFragment = VideoFragmentFactory
+				.createVideoFragment(R.raw.security_video);
 		peerDetailFragment = new PeerDetailFragment();
 		peersListFragment = new PeersListFragment();
-		
-		pictureFragment = new PictureFragment();
 
+		pictureFragment = new PictureFragment();
+		
 		createNavigationMenu();
 
 		createFilterMenu();
 
 		showMap();
+		
+
 	}
 
 	private void createNavigationMenu() {
@@ -104,7 +109,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		navigationDrawer.setMenu(R.layout.nav_drawer);
 
 		Fragment leftDrawerFragment;
-		FragmentTransaction transaction = this.getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = this.getFragmentManager()
+				.beginTransaction();
 		leftDrawerFragment = new NavigationDrawerFragment();
 		transaction.replace(R.id.nav_drawer, leftDrawerFragment);
 		transaction.commit();
@@ -121,7 +127,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		filterDrawer.setMenu(R.layout.filter_drawer);
 
 		Fragment rightDrawerFragment;
-		FragmentTransaction transaction = this.getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = this.getFragmentManager()
+				.beginTransaction();
 		rightDrawerFragment = new FilterDrawerFragment();
 		transaction.replace(R.id.filter_drawer, rightDrawerFragment);
 		transaction.commit();
@@ -139,15 +146,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 					peersListFragment.setAvailablePeers(peers);
 				}
 
-				// If we got a list of 0 peers, we've either disconnected, or there are no peers to be found after
+				// If we got a list of 0 peers, we've either disconnected, or
+				// there are no peers to be found after
 				// the timeout.
 				if (peers.getDeviceList().size() == 0) {
-					// Ensure that the detail fragment is made aware of a potential disconnect.
+					// Ensure that the detail fragment is made aware of a
+					// potential disconnect.
 					peerDetailFragment.setTargetDevice(null);
 					peerDetailFragment.setConnectionSuccessfulInformation(null);
 
 					FragmentManager fragmentManager = getFragmentManager();
-					fragmentManager.beginTransaction().replace(R.id.content, peersListFragment).commit();
+					fragmentManager.beginTransaction()
+							.replace(R.id.content, peersListFragment).commit();
 
 					fragmentManager.executePendingTransactions();
 
@@ -156,9 +166,12 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 			}
 
 			@Override
-			public void onConnectionInfoAvailable(final WifiP2pInfo connectionInfo) {
-				// We have made a connection, and the PeerDetail fragment should receive the connection information.
-				peerDetailFragment.setConnectionSuccessfulInformation(connectionInfo);
+			public void onConnectionInfoAvailable(
+					final WifiP2pInfo connectionInfo) {
+				// We have made a connection, and the PeerDetail fragment should
+				// receive the connection information.
+				peerDetailFragment
+						.setConnectionSuccessfulInformation(connectionInfo);
 
 				if (peerDetailFragment.isResumed()) {
 					peerDetailFragment.refresh();
@@ -167,7 +180,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 				Log.e("something", "client saving connect info and device");
 				client.setConnectionSuccessful(connectionInfo, targetDevice);
 
-				// Start the server thread to listen for incoming changes.				
+				// Start the server thread to listen for incoming changes.
 				server = new Server();
 				server.execute(ArcticThunderActivity.this);
 
@@ -203,11 +216,14 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showMap() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment)
+				.commit();
+		
 	}
 
 	public void showAR() {
-		WifiAssetsDefaultSetup s = new WifiAssetsDefaultSetup(this, getAssetList(), (OnWifiProximityListener) this);
+		WifiAssetsDefaultSetup s = new WifiAssetsDefaultSetup(this,
+				getAssetList(), (OnWifiProximityListener) this);
 		ArActivity.startWithSetup(this, s);
 
 	}
@@ -222,12 +238,14 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showModelViewer() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content, modelViewerFragment).commit();
 	}
 
 	public void showVideo() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, videoFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, videoFragment)
+				.commit();
 
 	}
 
@@ -237,8 +255,9 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showWifiDirect() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, peersListFragment).addToBackStack("PeersList")
-				.commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content, peersListFragment)
+				.addToBackStack("PeersList").commit();
 
 		fragmentManager.executePendingTransactions();
 
@@ -287,15 +306,17 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void disconnect() {
-		// Called by the PeerDetail fragment when the Disconnect button is pressed.
+		// Called by the PeerDetail fragment when the Disconnect button is
+		// pressed.
 		wifiDirectConnector.disconnect(new DisconnectionListener() {
 			@Override
 			public void onDisconnectionSuccess() {
 				peerDetailFragment.setTargetDevice(null);
 				peerDetailFragment.setConnectionSuccessfulInformation(null);
-				//peerDetailFragment.refresh();
+				// peerDetailFragment.refresh();
 
-				// On disconnect, stop the client from sending, and shut down the server thread.
+				// On disconnect, stop the client from sending, and shut down
+				// the server thread.
 				client.onDisconnect();
 
 				server.cancel(true);
@@ -312,15 +333,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showPeerDetails(final WifiP2pDevice device) {
-		// This is called by the PeerList fragment, when an item is selected. Save off the target device for
-		// the server connection, give it to the PeerDetail fragment, and switch the ViewPager automatically.
+		// This is called by the PeerList fragment, when an item is selected.
+		// Save off the target device for
+		// the server connection, give it to the PeerDetail fragment, and switch
+		// the ViewPager automatically.
 		Log.e("something", "saving peer detail");
 		targetDevice = device;
 		peerDetailFragment.setTargetDevice(device);
 
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, peerDetailFragment).addToBackStack("PeerDetail")
-				.commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content, peerDetailFragment)
+				.addToBackStack("PeerDetail").commit();
 
 		fragmentManager.executePendingTransactions();
 
@@ -357,17 +381,21 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void createAsset(final double lat, final double log, final Activity a) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(a);
-		builder.setTitle(R.string.identify_asset).setItems(AssetType.valuesAsCharSequence(),
+		builder.setTitle(R.string.identify_asset).setItems(
+				AssetType.valuesAsCharSequence(),
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
+					public void onClick(final DialogInterface dialog,
+							final int which) {
 						AssetType assetType = AssetType.values()[which];
 						AssetObject asset = new AssetObject(lat, log, assetType);
 						assets.add(asset);
 						mapsFragment.addAsset(asset);
-						if(assetType == AssetType.PHOTO){
-							Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							startActivityForResult(takePictureIntent, TAKE_SECURITY_PICTURE);
+						if (assetType == AssetType.PHOTO) {
+							Intent takePictureIntent = new Intent(
+									MediaStore.ACTION_IMAGE_CAPTURE);
+							startActivityForResult(takePictureIntent,
+									TAKE_SECURITY_PICTURE);
 						}
 					}
 				});
@@ -388,9 +416,10 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
-	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+	protected void onActivityResult(final int requestCode,
+			final int resultCode, final Intent data) {
 		// Check which request we're responding to
 		if (requestCode == TAKE_SECURITY_PICTURE) {
 			// Make sure the request was successful
@@ -399,11 +428,13 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 				Bundle extras = data.getExtras();
 				Bitmap mImageBitmap = (Bitmap) extras.get("data");
 
-				FragmentTransaction transaction = getFragmentManager().beginTransaction();
-				transaction.replace(R.id.content, pictureFragment).addToBackStack("camera");
+				FragmentTransaction transaction = getFragmentManager()
+						.beginTransaction();
+				transaction.replace(R.id.content, pictureFragment)
+						.addToBackStack("camera");
 				transaction.commit();
 
-				//mapFragmentShowing = false;
+				// mapFragmentShowing = false;
 
 				getFragmentManager().executePendingTransactions();
 
@@ -412,6 +443,56 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		}
 	}
 
-	
+	public void createWifiAssets() {
+		AssetObject asset;
+
+		asset = new AssetObject(39.974222, -74.976639, AssetType.WIFI);
+		assets.add(asset);
+		mapsFragment.addAsset(asset);
+
+		asset = new AssetObject(39.9743332, -74.975547, AssetType.WIFI);
+		assets.add(asset);
+		mapsFragment.addAsset(asset);
+
+		asset = new AssetObject(39.9757139, -74.977589, AssetType.WIFI);
+		assets.add(asset);
+		mapsFragment.addAsset(asset);
+	}
+
+	public void createSpyAssets(int index) {
+		AssetObject asset;
+
+		switch (index) {
+		case 1:
+			asset = new AssetObject(39.973806, -74.979490,
+					AssetType.ENEMY_WATCH_STAND);
+			assets.add(asset);
+			mapsFragment.addAsset(asset);
+
+			asset = new AssetObject(39.973181, -74.980155,
+					AssetType.ENEMY_VEHICLE);
+			assets.add(asset);
+			mapsFragment.addAsset(asset);
+
+			asset = new AssetObject(39.971786, -74.978396,
+					AssetType.ENEMY_BUILDING);
+			assets.add(asset);
+			mapsFragment.addAsset(asset);
+
+			break;
+		case 2:
+			asset = new AssetObject(39.973342, -74.975182,
+					AssetType.ENEMY_BUILDING);
+			assets.add(asset);
+			mapsFragment.addAsset(asset);
+
+			asset = new AssetObject(39.973342, -74.975182,
+					AssetType.ENEMY_ROAMING_TROOP);
+			assets.add(asset);
+			mapsFragment.addAsset(asset);
+
+			break;
+		}
+	}
 
 }

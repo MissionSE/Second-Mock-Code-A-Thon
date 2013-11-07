@@ -70,6 +70,7 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		private Circle mCircle;
 
 		AssetMarker(final AssetObject asset) {
+			
 			mCenterMarker = mMap.addMarker(new MarkerOptions()
 				.icon(asset.getType().getBitmap())
 				.title(asset.getType().toString())
@@ -194,7 +195,7 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		mMap.setOnMapLongClickListener(this);
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
-
+		((ArcticThunderActivity)getActivity()).createWifiAssets();
 		for (AssetType type: AssetType.values()) {
 			mAssetTypeVisibility.put(type, true);
 		}
