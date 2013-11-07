@@ -123,7 +123,13 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 					@Override
 					public void run() {
 						NFC_COUNT++;
-						showToast("saw NFC: " + NFC_COUNT);
+						showToast("Retrieved SPY DATA");
+
+						if (NFC_COUNT == 1) {
+							//ArcticThunderActivity.this.createSpyAssets(1);
+						} else if (NFC_COUNT == 2) {
+							//ArcticThunderActivity.this.createSpyAssets(2);
+						}
 					}
 
 				});
@@ -180,7 +186,13 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 					@Override
 					public void run() {
 						NFC_COUNT++;
-						showToast("saw NFC: " + NFC_COUNT);
+						showToast("Retrieved SPY DATA");
+
+						if (NFC_COUNT == 1) {
+							//ArcticThunderActivity.this.createSpyAssets(1);
+						} else if (NFC_COUNT == 2) {
+							//ArcticThunderActivity.this.createSpyAssets(2);
+						}
 					}
 
 				});

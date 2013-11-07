@@ -47,7 +47,8 @@ import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
 
 public class MapsFragment extends Fragment implements ConnectionCallbacks, OnConnectionFailedListener,
-LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener, OnInfoWindowClickListener {
+		LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener,
+		OnInfoWindowClickListener {
 
 	private static final LatLng MSE = new LatLng(39.974552, -74.976844);
 	private static final LatLng ZONE_A = new LatLng(39.974074, -74.977462);
@@ -66,7 +67,6 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 
 	private static View view;
 
-
 	// These settings are the same as the settings for the map. They will in fact give you updates
 	// at the maximal rates currently possible.
 	private static final LocationRequest REQUEST = LocationRequest.create().setInterval(5000) // 5 seconds
@@ -79,18 +79,13 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		private Circle mCircle;
 
 		AssetMarker(final AssetObject asset) {
-			float[] hsv = {0f, 0f, 0f};
+			float[] hsv = { 0f, 0f, 0f };
 			int iconColor = asset.getType().getColor();
 			Color.RGBToHSV(Color.red(iconColor), Color.green(iconColor), Color.blue(iconColor), hsv);
-			mCenterMarker = mMap.addMarker(new MarkerOptions()
-				.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]))
-				.title(asset.getType().toString())
-				.position(asset.getLatLng()));
-			mCircle = mMap.addCircle(new CircleOptions()
-				.center(asset.getLatLng())
-				.radius(asset.getType().getRadius())
-				.fillColor(asset.getType().getColor())
-				.strokeWidth(0));
+			mCenterMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(hsv[0]))
+					.title(asset.getType().toString()).position(asset.getLatLng()));
+			mCircle = mMap.addCircle(new CircleOptions().center(asset.getLatLng()).radius(asset.getType().getRadius())
+					.fillColor(asset.getType().getColor()).strokeWidth(0));
 		}
 
 		public void setVisible(final boolean visible) {
@@ -179,8 +174,8 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
-		default:
-			return super.onOptionsItemSelected(item);
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -211,9 +206,9 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		mMap.setOnInfoWindowClickListener(this);
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
-		((ArcticThunderActivity)getActivity()).createWifiAssets();
+		((ArcticThunderActivity) getActivity()).createWifiAssets();
 		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-		for (AssetType type: AssetType.values()) {
+		for (AssetType type : AssetType.values()) {
 			mAssetTypeVisibility.put(type, true);
 		}
 	}
@@ -277,49 +272,49 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 
 	class CustomInfoWindowAdapter implements InfoWindowAdapter {
 
-        // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
-        // "title" and "snippet".
-        private final View mWindow;
-        private final View mContents;
+		// These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
+		// "title" and "snippet".
+		private final View mWindow;
+		private final View mContents;
 
-        CustomInfoWindowAdapter() {
-            mWindow = getActivity().getLayoutInflater().inflate(R.layout.custom_info_window, null);
-            mContents = getActivity().getLayoutInflater().inflate(R.layout.custom_info_contents, null);
-        }
+		CustomInfoWindowAdapter() {
+			mWindow = getActivity().getLayoutInflater().inflate(R.layout.custom_info_window, null);
+			mContents = getActivity().getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+		}
 
-        @Override
-        public View getInfoWindow(final Marker marker) {
-            render(marker, mWindow);
-            return mWindow;
-        }
+		@Override
+		public View getInfoWindow(final Marker marker) {
+			render(marker, mWindow);
+			return mWindow;
+		}
 
-        @Override
-        public View getInfoContents(final Marker marker) {
-            render(marker, mContents);
-            return mContents;
-        }
+		@Override
+		public View getInfoContents(final Marker marker) {
+			render(marker, mContents);
+			return mContents;
+		}
 
-        private void render(final Marker marker, final View view) {
-            int badge = 0;
-            for (Entry<AssetObject, AssetMarker> entry : mAssetMarkers.entrySet()) {
-    			if (entry.getValue().getMarker().equals(marker)) {
-    				badge = entry.getKey().getType().getResourceId();
-    				break;
-    			}
-    		}
+		private void render(final Marker marker, final View view) {
+			int badge = 0;
+			for (Entry<AssetObject, AssetMarker> entry : mAssetMarkers.entrySet()) {
+				if (entry.getValue().getMarker().equals(marker)) {
+					badge = entry.getKey().getType().getResourceId();
+					break;
+				}
+			}
 
-            ((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
+			((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
 
-            String title = marker.getTitle();
-            TextView titleUi = ((TextView) view.findViewById(R.id.title));
-            if (title != null) {
-                // Spannable string allows us to edit the formatting of the text.
-                SpannableString titleText = new SpannableString(title);
-                titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
-                titleUi.setText(titleText);
-            } else {
-                titleUi.setText("");
-            }
-        }
-    }
+			String title = marker.getTitle();
+			TextView titleUi = ((TextView) view.findViewById(R.id.title));
+			if (title != null) {
+				// Spannable string allows us to edit the formatting of the text.
+				SpannableString titleText = new SpannableString(title);
+				titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
+				titleUi.setText(titleText);
+			} else {
+				titleUi.setText("");
+			}
+		}
+	}
 }
