@@ -2,12 +2,14 @@ package com.missionse.arcticthunder.map;
 
 import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import android.app.Fragment;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +28,12 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.missionse.arcticthunder.ArcticThunderActivity;
 import com.missionse.arcticthunder.R;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
@@ -39,7 +46,9 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 	private static final LatLng ZONE_B = new LatLng(39.975233, -74.977328);
 	private static final LatLng ZONE_C = new LatLng(39.975085, -74.976164);
 
-	private ArrayList<AssetObject> assets;
+	private HashMap<AssetObject, AssetMarker> mAssetMarkers;
+
+	private HashMap<AssetType, Boolean> mAssetTypeVisibility;
 
 	private GoogleMap mMap;
 
@@ -47,14 +56,40 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 
 	private boolean mFirstLocationChange = true;
 
+	private static View view;
+
 	// These settings are the same as the settings for the map. They will in fact give you updates
 	// at the maximal rates currently possible.
 	private static final LocationRequest REQUEST = LocationRequest.create().setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+	private class AssetMarker {
+
+		private Marker mCenterMarker;
+		private Circle mCircle;
+
+		AssetMarker(final AssetObject asset) {
+			mCenterMarker = mMap.addMarker(new MarkerOptions()
+				.icon(asset.getType().getBitmap())
+				.title(asset.getType().toString())
+				.position(asset.getLatLng()));
+			mCircle = mMap.addCircle(new CircleOptions()
+				.center(asset.getLatLng())
+				.radius(asset.getType().getRadius())
+				.fillColor(asset.getType().getColor())
+				.strokeWidth(0));
+		}
+
+		public void setVisible(final boolean visible) {
+			mCenterMarker.setVisible(visible);
+			mCircle.setVisible(visible);
+		}
+	}
+
 	public MapsFragment() {
-		assets = new ArrayList<AssetObject>();
+		mAssetMarkers = new HashMap<AssetObject, AssetMarker>();
+		mAssetTypeVisibility = new HashMap<AssetType, Boolean>();
 	}
 
 	@Override
@@ -66,8 +101,19 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.fragment_map, container, false);
-		return v;
+		if (view != null) {
+			ViewGroup parent = (ViewGroup) view.getParent();
+			if (parent != null) {
+				parent.removeView(view);
+			}
+		}
+		try {
+			view = inflater.inflate(R.layout.fragment_map, container, false);
+		} catch (InflateException e) {
+			// Map already exists.
+		}
+
+		return view;
 	}
 
 	@Override
@@ -117,8 +163,8 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
-			default:
-				return super.onOptionsItemSelected(item);
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -148,11 +194,21 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		mMap.setOnMapLongClickListener(this);
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
+
+		for (AssetType type: AssetType.values()) {
+			mAssetTypeVisibility.put(type, true);
+		}
+	}
+
+	public void addAsset(final AssetObject asset) {
+
+		AssetMarker assetMarker = new AssetMarker(asset);
+		mAssetMarkers.put(asset, assetMarker);
 	}
 
 	@Override
 	public void onMapLongClick(final LatLng point) {
-		Log.e("MapsFragment", "onMapLongClick: " + point);
+		((ArcticThunderActivity) getActivity()).createAsset(point.latitude, point.longitude, getActivity());
 	}
 
 	@Override
@@ -161,10 +217,20 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 	}
 
 	public void setAssetShown(final AssetType type, final boolean visible) {
+		mAssetTypeVisibility.put(type, Boolean.valueOf(visible));
 
+		for (Entry<AssetObject, AssetMarker> entry : mAssetMarkers.entrySet()) {
+			if (entry.getKey().getType() == type) {
+				entry.getValue().setVisible(visible);
+			}
+		}
 	}
 
 	public boolean isAssetShown(final AssetType type) {
+		Boolean visible = mAssetTypeVisibility.get(type);
+		if (visible != null) {
+			return visible.booleanValue();
+		}
 		return false;
 	}
 }

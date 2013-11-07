@@ -183,7 +183,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showAR() {
-		WifiAssetsDefaultSetup s = 
+		WifiAssetsDefaultSetup s =
 				new WifiAssetsDefaultSetup(
 						this,
 						getAssetList(),
@@ -330,20 +330,16 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		return mapsFragment.isAssetShown(type);
 	}
 
-	public void createAsset(final double lat, final double log, Activity a) {
-		// TODO:
+	public void createAsset(final double lat, final double log, final Activity a) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(a);
 		builder.setTitle(R.string.identify_asset).setItems(AssetType.valuesAsCharSequence(),
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int which) {
-						//AssetType assetType = AssetType.values()[which];
-						//AssetObject asset = new AssetObject(
-						//		mCurrentAssetLatLng.latitude,
-						//		mCurrentAssetLatLng.longitude, assetType);
-						//AssetMarker assetMarker = new AssetMarker(asset);
-						//mAssetMarkers.add(assetMarker);
-						//TODO:
+						AssetType assetType = AssetType.values()[which];
+						AssetObject asset = new AssetObject(lat, log, assetType);
+						assets.add(asset);
+						mapsFragment.addAsset(asset);
 					}
 				});
 		builder.create();
@@ -359,9 +355,9 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	@Override
-	public void onWifiProximityReached(Activity activity) {
+	public void onWifiProximityReached(final Activity activity) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
