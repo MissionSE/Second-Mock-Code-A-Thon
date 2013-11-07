@@ -3,6 +3,7 @@ package com.missionse.arcticthunder;
 import java.util.LinkedList;
 import java.util.List;
 
+import system.ArActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -19,6 +20,8 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
+import com.missionse.arcticthunder.augmented.setups.WifiAssetsDefaultSetup;
 import com.missionse.arcticthunder.map.MapsFragment;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
@@ -180,6 +183,12 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	public void showAR() {
+		WifiAssetsDefaultSetup s = 
+				new WifiAssetsDefaultSetup(
+						this,
+						getAssetList(),
+						(OnWifiProximityListener)this);
+		ArActivity.startWithSetup(this, s);
 
 	}
 
