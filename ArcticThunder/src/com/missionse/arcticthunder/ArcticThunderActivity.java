@@ -9,6 +9,7 @@ import android.view.Menu;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.map.MapsFragment;
+import com.missionse.arcticthunder.model.AssetType;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
 import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
@@ -43,7 +44,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		navigationDrawer.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 		navigationDrawer.setShadowWidthRes(R.dimen.drawer_shadow_width);
 		navigationDrawer.setShadowDrawable(R.drawable.shadow_left);
-		navigationDrawer.setBehindWidthRes(R.dimen.drawer_width);
+		navigationDrawer.setBehindWidthRes(R.dimen.nav_drawer_width);
 		navigationDrawer.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 		navigationDrawer.setMenu(R.layout.nav_drawer);
 
@@ -60,7 +61,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		filterDrawer.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 		filterDrawer.setShadowWidthRes(R.dimen.drawer_shadow_width);
 		filterDrawer.setShadowDrawable(R.drawable.shadow_right);
-		filterDrawer.setBehindWidthRes(R.dimen.drawer_width);
+		filterDrawer.setBehindWidthRes(R.dimen.filter_drawer_width);
 		filterDrawer.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 		filterDrawer.setMenu(R.layout.filter_drawer);
 
@@ -114,6 +115,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	}
 
 	/**
+	 * Networking callbacks
+	 */
+
+	public void showWifiDirect() {
+
+	}
+
+	public void sendDataOverWifi() {
+
+	}
+
+	/**
 	 * CALLBACKS
 	 */
 
@@ -122,6 +135,18 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		modelViewerFragment.getController().scale(0.00025f);
 		modelViewerFragment.getAnimator().scaleTo(0.045f, 1000);
 		modelViewerFragment.getAnimator().rotateTo(-45f, 225f, 0f, 1000);
+	}
+
+	/**
+	 * HOOKS FOR MANIUPLATING ASSETS
+	 */
+
+	public void setAssetShown(final AssetType type, final boolean visible) {
+		mapsFragment.setAssetShown(type, visible);
+	}
+
+	public boolean isAssetShown(final AssetType type) {
+		return mapsFragment.isAssetShown(type);
 	}
 
 }

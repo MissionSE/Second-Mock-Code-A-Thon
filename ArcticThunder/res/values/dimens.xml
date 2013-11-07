@@ -4,7 +4,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     
-    <dimen name="drawer_width">250dp</dimen>
+    <dimen name="nav_drawer_width">250dp</dimen>
+    <dimen name="filter_drawer_width">350dp</dimen>
     <dimen name="drawer_shadow_width">15dp</dimen>
     <dimen name="drawer_list_padding">2dp</dimen>
 

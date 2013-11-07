@@ -4,49 +4,181 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.missionse.arcticthunder.model.AssetType;
+
 public class FilterDrawerFragment extends ListFragment {
+
+	private final List<String> menuItems = new ArrayList<String>();
+	private ListView listView;
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.filter_drawer_list, null);
+		View view = inflater.inflate(R.layout.filter_drawer_list, null);
+		listView = (ListView) view.findViewById(R.id.filter_list);
+		return view;
 	}
 
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
 		createMenu();
 	}
 
 	private void createMenu() {
-		final List<String> menuItems = new ArrayList<String>();
 		menuItems.add("ENEMY ASSETS");
+		menuItems.add("Enemy Vehicles");
+		menuItems.add("Enemy Buildings");
+		menuItems.add("Enemy Watch Stands");
+		menuItems.add("Roaming Troops");
 		menuItems.add("TOWN ASSETS");
+		menuItems.add("Church");
+		menuItems.add("Schools");
+		menuItems.add("Malls");
 		menuItems.add("PHOTOS/VIDEOS");
 		menuItems.add("HOTSPOTS");
 		menuItems.add("POSSIBLE THREATS");
 
-		setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.nav_drawer_item, R.id.nav_drawer_text,
-				menuItems));
+		setListAdapter(new FilterAdapter(getActivity(), R.layout.filter_drawer_item, menuItems));
 	}
 
-	@Override
-	public void onListItemClick(final ListView listView, final View view, final int position, final long id) {
+	public void onCheckboxStateChange(final String item, final boolean isChecked) {
 		ArcticThunderActivity activity = (ArcticThunderActivity) getActivity();
 
-		String selectedItem = (String) listView.getAdapter().getItem(position);
-		if (selectedItem.equals("Enemy Assets")) {
-			//activity.filterEnemyAssets();
-		} else if (selectedItem.equals("Town Assets")) {
-			//activity.filterTownAssets();
-		} else if (selectedItem.equals("Photos/Video")) {
-			//activity.filterPhotosVideos();
+		if (item.equals("ENEMY ASSETS")) {
+			activity.setAssetShown(AssetType.ENEMY_BUILDING, isChecked);
+			activity.setAssetShown(AssetType.ENEMY_ROAMING_TROOP, isChecked);
+			activity.setAssetShown(AssetType.ENEMY_VEHICLE, isChecked);
+			activity.setAssetShown(AssetType.ENEMY_WATCH_STAND, isChecked);
+		} else if (item.equals("Enemy Vehicles")) {
+			activity.setAssetShown(AssetType.ENEMY_VEHICLE, isChecked);
+		} else if (item.equals("Enemy Buildings")) {
+			activity.setAssetShown(AssetType.ENEMY_BUILDING, isChecked);
+		} else if (item.equals("Enemy Watch Stands")) {
+			activity.setAssetShown(AssetType.ENEMY_WATCH_STAND, isChecked);
+		} else if (item.equals("Roaming Troops")) {
+			activity.setAssetShown(AssetType.ENEMY_ROAMING_TROOP, isChecked);
+		} else if (item.equals("TOWN ASSETS")) {
+			activity.setAssetShown(AssetType.TOWN_CHURCH, isChecked);
+			activity.setAssetShown(AssetType.TOWN_MALL, isChecked);
+			activity.setAssetShown(AssetType.TOWN_SCHOOL, isChecked);
+		} else if (item.equals("Church")) {
+			activity.setAssetShown(AssetType.TOWN_CHURCH, isChecked);
+		} else if (item.equals("Schools")) {
+			activity.setAssetShown(AssetType.TOWN_SCHOOL, isChecked);
+		} else if (item.equals("Malls")) {
+			activity.setAssetShown(AssetType.TOWN_MALL, isChecked);
+		} else if (item.equals("PHOTOS/VIDEOS")) {
+			activity.setAssetShown(AssetType.PHOTO, isChecked);
+			activity.setAssetShown(AssetType.VIDEO, isChecked);
+		} else if (item.equals("HOTSPOTS")) {
+			activity.setAssetShown(AssetType.WIFI, isChecked);
+		} else if (item.equals("POSSIBLE THREATS")) {
+			activity.setAssetShown(AssetType.POSSIBLE_THREAT, isChecked);
+		}
+
+		updateCheckboxes(activity);
+	}
+
+	private void updateCheckboxes(final ArcticThunderActivity activity) {
+		for (int index = 0; index < menuItems.size(); index++) {
+			String item = (String) getListAdapter().getItem(index);
+			if (item.equals("Enemy Vehicles")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_VEHICLE));
+			} else if (item.equals("Enemy Buildings")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_BUILDING));
+			} else if (item.equals("Enemy Watch Stands")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.ENEMY_WATCH_STAND));
+			} else if (item.equals("Roaming Troops")) {
+				((CheckBox) listView.getChildAt(index))
+						.setChecked(activity.isAssetShown(AssetType.ENEMY_ROAMING_TROOP));
+			} else if (item.equals("Church")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_CHURCH));
+			} else if (item.equals("Schools")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
+			} else if (item.equals("Malls")) {
+				((CheckBox) listView.getChildAt(index)).setChecked(activity.isAssetShown(AssetType.TOWN_SCHOOL));
+			}
+		}
+
+	}
+
+	private class FilterAdapter extends ArrayAdapter<String> {
+
+		private int listItemResource;
+		private List<String> filters;
+
+		public FilterAdapter(final Context context, final int resource, final List<String> filters) {
+			super(context, resource, filters);
+			listItemResource = resource;
+			this.filters = filters;
+		}
+
+		@Override
+		public View getView(final int position, View convertView, final ViewGroup parent) {
+			if (convertView == null) {
+				LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = vi.inflate(listItemResource, null);
+			}
+
+			String item = filters.get(position);
+			if (item != null) {
+				ImageView icon = (ImageView) convertView.findViewById(R.id.filter_drawer_icon);
+				CheckBox text = (CheckBox) convertView.findViewById(R.id.filter_drawer_text);
+
+				LinearLayout.LayoutParams leftPadding = new LinearLayout.LayoutParams(
+						LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+				leftPadding.setMargins(30, 0, 0, 0);
+
+				if (icon != null && text != null) {
+					if (item.equals("ENEMY ASSETS")) {
+						icon.setVisibility(View.GONE);
+					} else if (item.equals("Enemy Vehicles")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Enemy Buildings")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Enemy Watch Stands")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Roaming Troops")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("TOWN ASSETS")) {
+						icon.setVisibility(View.GONE);
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Church")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Schools")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("Malls")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("PHOTOS/VIDEOS")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("HOTSPOTS")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					} else if (item.equals("POSSIBLE THREATS")) {
+						icon.setImageResource(R.drawable.ic_launcher);
+					}
+					text.setText(item);
+					text.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+							FilterDrawerFragment.this.onCheckboxStateChange(buttonView.getText().toString(), isChecked);
+						}
+					});
+				}
+			}
+			return convertView;
 		}
 	}
 }
