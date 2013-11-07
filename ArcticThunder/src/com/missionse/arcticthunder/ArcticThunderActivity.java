@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 
@@ -18,7 +20,8 @@ import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
 import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
 
-public class ArcticThunderActivity extends Activity implements ObjectLoadedListener {
+public class ArcticThunderActivity extends Activity implements
+		ObjectLoadedListener {
 
 	private SlidingMenu navigationDrawer;
 	private SlidingMenu filterDrawer;
@@ -33,7 +36,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		setContentView(R.layout.activity_main);
 
 		mapsFragment = new MapsFragment();
-		modelViewerFragment = ModelViewerFragmentFactory.createObjModelFragment(R.raw.lobby_obj);
+		modelViewerFragment = ModelViewerFragmentFactory
+				.createObjModelFragment(R.raw.lobby_obj);
 		modelViewerFragment.registerObjectLoadedListener(this);
 
 		createNavigationMenu();
@@ -54,7 +58,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		navigationDrawer.setMenu(R.layout.nav_drawer);
 
 		Fragment leftDrawerFragment;
-		FragmentTransaction transaction = this.getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = this.getFragmentManager()
+				.beginTransaction();
 		leftDrawerFragment = new NavigationDrawerFragment();
 		transaction.replace(R.id.nav_drawer, leftDrawerFragment);
 		transaction.commit();
@@ -71,7 +76,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		filterDrawer.setMenu(R.layout.filter_drawer);
 
 		Fragment rightDrawerFragment;
-		FragmentTransaction transaction = this.getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = this.getFragmentManager()
+				.beginTransaction();
 		rightDrawerFragment = new FilterDrawerFragment();
 		transaction.replace(R.id.filter_drawer, rightDrawerFragment);
 		transaction.commit();
@@ -90,14 +96,15 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showMap() {
 		FragmentManager fragmentManager = getFragmentManager();
-		//Fragment fragment = fragmentManager.findFragmentById(R.id.content);
+		// Fragment fragment = fragmentManager.findFragmentById(R.id.content);
 
-		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment)
+				.commit();
 
-		//		if (!fragment instanceof) {
-		//			fragment = new MapsFragment();
-		//			fm.beginTransaction().add(R.id.content, fragment).commit();
-		//		}
+		// if (!fragment instanceof) {
+		// fragment = new MapsFragment();
+		// fm.beginTransaction().add(R.id.content, fragment).commit();
+		// }
 	}
 
 	public void showAR() {
@@ -110,13 +117,15 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 
 	public void showChat() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content, modelViewerFragment).commit();
 
 	}
 
 	public void showModelViewer() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content, modelViewerFragment).commit();
 	}
 
 	/**
@@ -153,12 +162,28 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	public boolean isAssetShown(final AssetType type) {
 		return mapsFragment.isAssetShown(type);
 	}
-	
-	public void createAsset(double lat, double log, AssetType type){
-		//TODO:
+
+	public void createAsset(double lat, double log) {
+		// TODO:
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.identify_asset).setItems(
+				AssetType.valuesAsCharSequence(),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						//AssetType assetType = AssetType.values()[which];
+						//AssetObject asset = new AssetObject(
+						//		mCurrentAssetLatLng.latitude,
+						//		mCurrentAssetLatLng.longitude, assetType);
+						//AssetMarker assetMarker = new AssetMarker(asset);
+						//mAssetMarkers.add(assetMarker);
+						//TODO:
+					}
+				});
+		builder.create();
+		builder.show();
 	}
-	
-	public List<AssetObject> getAssetList(){
+
+	public List<AssetObject> getAssetList() {
 		return assets;
 	}
 
