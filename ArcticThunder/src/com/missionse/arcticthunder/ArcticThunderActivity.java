@@ -10,18 +10,22 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
 import com.missionse.arcticthunder.augmented.setups.WifiAssetsDefaultSetup;
+import com.missionse.arcticthunder.camera.PictureFragment;
 import com.missionse.arcticthunder.map.MapsFragment;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
@@ -39,6 +43,9 @@ import com.missionse.arcticthunder.wifidirect.connector.P2pStateChangeHandler;
 import com.missionse.arcticthunder.wifidirect.connector.WifiDirectConnector;
 
 public class ArcticThunderActivity extends Activity implements ObjectLoadedListener, OnWifiProximityListener {
+	
+	static final int TAKE_SECURITY_PICTURE = 1234;
+
 
 	private final WifiDirectConnector wifiDirectConnector = new WifiDirectConnector();
 
@@ -49,6 +56,7 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 	private ModelViewerFragment modelViewerFragment;
 	private List<AssetObject> assets = new LinkedList<AssetObject>();
 	private VideoFragment videoFragment;
+	private PictureFragment pictureFragment;
 
 	private PeerDetailFragment peerDetailFragment;
 	private PeersListFragment peersListFragment;
@@ -70,6 +78,8 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
 		peerDetailFragment = new PeerDetailFragment();
 		peersListFragment = new PeersListFragment();
+		
+		pictureFragment = new PictureFragment();
 
 		createNavigationMenu();
 
@@ -340,6 +350,10 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 						AssetObject asset = new AssetObject(lat, log, assetType);
 						assets.add(asset);
 						mapsFragment.addAsset(asset);
+						if(assetType == AssetType.PHOTO){
+							Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+							startActivityForResult(takePictureIntent, TAKE_SECURITY_PICTURE);
+						}
 					}
 				});
 		builder.create();
@@ -359,5 +373,30 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		// Check which request we're responding to
+		if (requestCode == TAKE_SECURITY_PICTURE) {
+			// Make sure the request was successful
+			if (resultCode == RESULT_OK) {
+
+				Bundle extras = data.getExtras();
+				Bitmap mImageBitmap = (Bitmap) extras.get("data");
+
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.content, pictureFragment).addToBackStack("camera");
+				transaction.commit();
+
+				//mapFragmentShowing = false;
+
+				getFragmentManager().executePendingTransactions();
+
+				pictureFragment.setImageBitmap(mImageBitmap);
+			}
+		}
+	}
+
+	
 
 }

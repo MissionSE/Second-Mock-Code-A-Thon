@@ -28,7 +28,7 @@ public class NavigationDrawerFragment extends ListFragment {
 		final List<String> menuItems = new ArrayList<String>();
 		menuItems.add("MAP");
 		menuItems.add("AR");
-		menuItems.add("CAMERA");
+		//menuItems.add("CAMERA");
 		menuItems.add("CHAT");
 
 		setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.nav_drawer_item, R.id.nav_drawer_text,
