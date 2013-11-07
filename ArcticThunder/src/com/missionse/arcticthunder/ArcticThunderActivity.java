@@ -9,13 +9,17 @@ import android.view.Menu;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.map.MapsFragment;
+import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
+import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
+import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
 
-public class ArcticThunderActivity extends Activity {
+public class ArcticThunderActivity extends Activity implements ObjectLoadedListener {
 
 	private SlidingMenu navigationDrawer;
 	private SlidingMenu filterDrawer;
 
 	private MapsFragment mapsFragment;
+	private ModelViewerFragment modelViewerFragment;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -23,6 +27,8 @@ public class ArcticThunderActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		mapsFragment = new MapsFragment();
+		modelViewerFragment = ModelViewerFragmentFactory.createObjModelFragment(R.raw.lobby_obj);
+		modelViewerFragment.registerObjectLoadedListener(this);
 
 		createNavigationMenu();
 
@@ -97,7 +103,25 @@ public class ArcticThunderActivity extends Activity {
 	}
 
 	public void showChat() {
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
 
+	}
+
+	public void showModelViewer() {
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).commit();
+	}
+
+	/**
+	 * CALLBACKS
+	 */
+
+	@Override
+	public void onObjectLoaded() {
+		modelViewerFragment.getController().scale(0.00025f);
+		modelViewerFragment.getAnimator().scaleTo(0.045f, 1000);
+		modelViewerFragment.getAnimator().rotateTo(-45f, 225f, 0f, 1000);
 	}
 
 }
