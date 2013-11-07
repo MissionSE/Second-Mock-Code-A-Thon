@@ -28,7 +28,6 @@ public class NavigationDrawerFragment extends ListFragment {
 		final List<String> menuItems = new ArrayList<String>();
 		menuItems.add("MAP");
 		menuItems.add("AR");
-		//menuItems.add("CAMERA");
 		menuItems.add("CHAT");
 
 		setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.nav_drawer_item, R.id.nav_drawer_text,
@@ -42,8 +41,6 @@ public class NavigationDrawerFragment extends ListFragment {
 		String selectedItem = (String) listView.getAdapter().getItem(position);
 		if (selectedItem.equals("MAP")) {
 			activity.showMap();
-		} else if (selectedItem.equals("CAMERA")) {
-			activity.showCamera();
 		} else if (selectedItem.equals("AR")) {
 			activity.showAR();
 		} else if (selectedItem.equals("CHAT")) {

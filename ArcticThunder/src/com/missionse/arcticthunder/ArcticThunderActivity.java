@@ -21,18 +21,22 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.missionse.arcticthunder.augmented.interfaces.OnWifiProximityListener;
 import com.missionse.arcticthunder.augmented.setups.WifiAssetsDefaultSetup;
 import com.missionse.arcticthunder.camera.PictureFragment;
+import com.missionse.arcticthunder.imageviewer.ImageFragment;
 import com.missionse.arcticthunder.map.MapsFragment;
 import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragment;
 import com.missionse.arcticthunder.modelviewer.ModelViewerFragmentFactory;
 import com.missionse.arcticthunder.modelviewer.ObjectLoadedListener;
+import com.missionse.arcticthunder.nfc.NfcConnectionListener;
+import com.missionse.arcticthunder.nfc.NfcConnector;
 import com.missionse.arcticthunder.videoviewer.VideoFragment;
 import com.missionse.arcticthunder.videoviewer.VideoFragmentFactory;
 import com.missionse.arcticthunder.wifidirect.PeerDetailFragment;
@@ -51,6 +55,9 @@ public class ArcticThunderActivity extends Activity implements
 	static final int TAKE_SECURITY_PICTURE = 1234;
 
 	private final WifiDirectConnector wifiDirectConnector = new WifiDirectConnector();
+	private final NfcConnector nfcConnector = new NfcConnector();
+
+	public static boolean COMMANDER_MODE = false;
 
 	private SlidingMenu navigationDrawer;
 	private SlidingMenu filterDrawer;
@@ -59,6 +66,7 @@ public class ArcticThunderActivity extends Activity implements
 	private ModelViewerFragment modelViewerFragment;
 	private List<AssetObject> assets = new LinkedList<AssetObject>();
 	private VideoFragment videoFragment;
+	private ImageFragment imageFragment;
 	private PictureFragment pictureFragment;
 
 	private PeerDetailFragment peerDetailFragment;
@@ -76,14 +84,16 @@ public class ArcticThunderActivity extends Activity implements
 		client = new Client(this);
 
 		wifiDirectConnector.onCreate(this);
+		nfcConnector.onCreate(this);
 
 		mapsFragment = new MapsFragment();
 		modelViewerFragment = ModelViewerFragmentFactory
 				.createObjModelFragment(R.raw.lobby_obj);
 		modelViewerFragment.registerObjectLoadedListener(this);
 
-		videoFragment = VideoFragmentFactory
-				.createVideoFragment(R.raw.security_video);
+		videoFragment = VideoFragmentFactory.createVideoFragment(R.raw.security_video);
+		imageFragment = new ImageFragment();
+
 		peerDetailFragment = new PeerDetailFragment();
 		peersListFragment = new PeersListFragment();
 
@@ -96,6 +106,28 @@ public class ArcticThunderActivity extends Activity implements
 		showMap();
 		
 
+	}
+
+	@Override
+	public void onNewIntent(final Intent intent) {
+		Log.e("something", "got nfc");
+		setIntent(intent);
+		NfcConnector.parseIntent(getIntent(), new NfcConnectionListener() {
+			@Override
+			public void onNfcConnection() {
+				Log.e("something", "got nfc");
+
+				ArcticThunderActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						showToast("saw NFC");
+					}
+
+				});
+
+			}
+		});
 	}
 
 	private void createNavigationMenu() {
@@ -137,6 +169,24 @@ public class ArcticThunderActivity extends Activity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		NfcConnector.parseIntent(getIntent(), new NfcConnectionListener() {
+			@Override
+			public void onNfcConnection() {
+				Log.e("something", "got nfc");
+
+				ArcticThunderActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						showToast("saw NFC");
+					}
+
+				});
+
+			}
+		});
+
 		wifiDirectConnector.onResume(this);
 		wifiDirectConnector.addStateChangeHandler(new P2pStateChangeHandler() {
 			@Override
@@ -210,11 +260,24 @@ public class ArcticThunderActivity extends Activity implements
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_commander_mode:
+				item.setChecked(!item.isChecked());
+				COMMANDER_MODE = item.isChecked();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
 	/**
 	 * HOOKS FROM MENUS
 	 */
 
 	public void showMap() {
+		navigationDrawer.showContent();
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.content, mapsFragment)
 				.commit();
@@ -225,28 +288,30 @@ public class ArcticThunderActivity extends Activity implements
 		WifiAssetsDefaultSetup s = new WifiAssetsDefaultSetup(this,
 				getAssetList(), (OnWifiProximityListener) this);
 		ArActivity.startWithSetup(this, s);
-
-	}
-
-	public void showCamera() {
-		showWifiDirect();
 	}
 
 	public void showChat() {
-
+		navigationDrawer.showContent();
 	}
 
 	public void showModelViewer() {
+		navigationDrawer.showContent();
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.content, modelViewerFragment).commit();
+		fragmentManager.beginTransaction().replace(R.id.content, modelViewerFragment).addToBackStack("ModelViewer")
+				.commit();
 	}
 
 	public void showVideo() {
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content, videoFragment)
-				.commit();
+		fragmentManager.beginTransaction().replace(R.id.content, videoFragment).addToBackStack("Video").commit();
 
+	}
+
+	public void showPhoto() {
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content, imageFragment)
+			.addToBackStack("Image")
+			.commit();
 	}
 
 	/**
@@ -392,10 +457,8 @@ public class ArcticThunderActivity extends Activity implements
 						assets.add(asset);
 						mapsFragment.addAsset(asset);
 						if (assetType == AssetType.PHOTO) {
-							Intent takePictureIntent = new Intent(
-									MediaStore.ACTION_IMAGE_CAPTURE);
-							startActivityForResult(takePictureIntent,
-									TAKE_SECURITY_PICTURE);
+							Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+							startActivityForResult(takePictureIntent, TAKE_SECURITY_PICTURE);
 						}
 					}
 				});
@@ -442,7 +505,6 @@ public class ArcticThunderActivity extends Activity implements
 			}
 		}
 	}
-
 	public void createWifiAssets() {
 		AssetObject asset;
 

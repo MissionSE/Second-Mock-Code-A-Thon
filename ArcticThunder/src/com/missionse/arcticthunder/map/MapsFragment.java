@@ -6,14 +6,19 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -23,10 +28,13 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -39,7 +47,7 @@ import com.missionse.arcticthunder.model.AssetObject;
 import com.missionse.arcticthunder.model.AssetType;
 
 public class MapsFragment extends Fragment implements ConnectionCallbacks, OnConnectionFailedListener,
-LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener {
+LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLongClickListener, OnInfoWindowClickListener {
 
 	private static final LatLng MSE = new LatLng(39.974552, -74.976844);
 	private static final LatLng ZONE_A = new LatLng(39.974074, -74.977462);
@@ -58,6 +66,7 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 
 	private static View view;
 
+
 	// These settings are the same as the settings for the map. They will in fact give you updates
 	// at the maximal rates currently possible.
 	private static final LocationRequest REQUEST = LocationRequest.create().setInterval(5000) // 5 seconds
@@ -70,9 +79,11 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		private Circle mCircle;
 
 		AssetMarker(final AssetObject asset) {
-			
+			float[] hsv = {0f, 0f, 0f};
+			int iconColor = asset.getType().getColor();
+			Color.RGBToHSV(Color.red(iconColor), Color.green(iconColor), Color.blue(iconColor), hsv);
 			mCenterMarker = mMap.addMarker(new MarkerOptions()
-				.icon(asset.getType().getBitmap())
+				.icon(BitmapDescriptorFactory.defaultMarker(hsv[0]))
 				.title(asset.getType().toString())
 				.position(asset.getLatLng()));
 			mCircle = mMap.addCircle(new CircleOptions()
@@ -85,6 +96,10 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		public void setVisible(final boolean visible) {
 			mCenterMarker.setVisible(visible);
 			mCircle.setVisible(visible);
+		}
+
+		public Marker getMarker() {
+			return mCenterMarker;
 		}
 	}
 
@@ -193,9 +208,11 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		mMap.setOnMyLocationButtonClickListener(this);
 		mMap.setOnMapClickListener(this);
 		mMap.setOnMapLongClickListener(this);
+		mMap.setOnInfoWindowClickListener(this);
 		mMap.setBuildingsEnabled(true);
 		mMap.setMapType(MAP_TYPE_HYBRID);
 		((ArcticThunderActivity)getActivity()).createWifiAssets();
+		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 		for (AssetType type: AssetType.values()) {
 			mAssetTypeVisibility.put(type, true);
 		}
@@ -217,6 +234,29 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		Log.e("MapsFragment", "onMapClick: " + point);
 	}
 
+	@Override
+	public void onInfoWindowClick(final Marker marker) {
+		AssetType type = null;
+		for (Entry<AssetObject, AssetMarker> entry : mAssetMarkers.entrySet()) {
+			if (entry.getValue().getMarker().equals(marker)) {
+				type = entry.getKey().getType();
+				break;
+			}
+		}
+
+		if (type != null) {
+			if (type.equals(AssetType.ENEMY_BUILDING)) {
+				((ArcticThunderActivity) getActivity()).showModelViewer();
+			} else if (type.equals(AssetType.VIDEO)) {
+				((ArcticThunderActivity) getActivity()).showVideo();
+			} else if (type.equals(AssetType.PHOTO)) {
+				((ArcticThunderActivity) getActivity()).showPhoto();
+			} else if (type.equals(AssetType.WIFI)) {
+				((ArcticThunderActivity) getActivity()).showWifiDirect();
+			}
+		}
+	}
+
 	public void setAssetShown(final AssetType type, final boolean visible) {
 		mAssetTypeVisibility.put(type, Boolean.valueOf(visible));
 
@@ -234,4 +274,52 @@ LocationListener, OnMyLocationButtonClickListener, OnMapClickListener, OnMapLong
 		}
 		return false;
 	}
+
+	class CustomInfoWindowAdapter implements InfoWindowAdapter {
+
+        // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
+        // "title" and "snippet".
+        private final View mWindow;
+        private final View mContents;
+
+        CustomInfoWindowAdapter() {
+            mWindow = getActivity().getLayoutInflater().inflate(R.layout.custom_info_window, null);
+            mContents = getActivity().getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+        }
+
+        @Override
+        public View getInfoWindow(final Marker marker) {
+            render(marker, mWindow);
+            return mWindow;
+        }
+
+        @Override
+        public View getInfoContents(final Marker marker) {
+            render(marker, mContents);
+            return mContents;
+        }
+
+        private void render(final Marker marker, final View view) {
+            int badge = 0;
+            for (Entry<AssetObject, AssetMarker> entry : mAssetMarkers.entrySet()) {
+    			if (entry.getValue().getMarker().equals(marker)) {
+    				badge = entry.getKey().getType().getResourceId();
+    				break;
+    			}
+    		}
+
+            ((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
+
+            String title = marker.getTitle();
+            TextView titleUi = ((TextView) view.findViewById(R.id.title));
+            if (title != null) {
+                // Spannable string allows us to edit the formatting of the text.
+                SpannableString titleText = new SpannableString(title);
+                titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
+                titleUi.setText(titleText);
+            } else {
+                titleUi.setText("");
+            }
+        }
+    }
 }
