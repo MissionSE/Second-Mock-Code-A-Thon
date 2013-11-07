@@ -330,9 +330,9 @@ public class ArcticThunderActivity extends Activity implements ObjectLoadedListe
 		return mapsFragment.isAssetShown(type);
 	}
 
-	public void createAsset(final double lat, final double log) {
+	public void createAsset(final double lat, final double log, Activity a) {
 		// TODO:
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(a);
 		builder.setTitle(R.string.identify_asset).setItems(AssetType.valuesAsCharSequence(),
 				new DialogInterface.OnClickListener() {
 					@Override

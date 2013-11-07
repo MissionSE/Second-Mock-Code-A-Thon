@@ -114,14 +114,14 @@ public class WifiAssetsDefaultSetup extends DefaultSetup {
 			
 							GeoObj o = new GeoObj();
 							o.setComp(mesh4);
-							getWorld().add(mesh4);
+							//getWorld().add(mesh4);
 			
 							//o.setPosition(rayPosition.add(rayDirection));
 							o.setMyPosition(rayPosition.add(rayDirection));
 							
 							logInfo("Creating new mark at " + o.getLatitude() + " / " + o.getLongitude());
 							if(parentActivity != null)
-								parentActivity.createAsset(o.getLatitude(), o.getLongitude());
+								parentActivity.createAsset(o.getLatitude(), o.getLongitude(),getActivity());
 							
 							return false;
 						}
