@@ -28,7 +28,7 @@ public class NavigationDrawerFragment extends ListFragment {
 		final List<String> menuItems = new ArrayList<String>();
 		menuItems.add("MAP");
 		menuItems.add("AR");
-		menuItems.add("CHAT");
+		menuItems.add("WIFI");
 
 		setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.nav_drawer_item, R.id.nav_drawer_text,
 				menuItems));
@@ -43,7 +43,7 @@ public class NavigationDrawerFragment extends ListFragment {
 			activity.showMap();
 		} else if (selectedItem.equals("AR")) {
 			activity.showAR();
-		} else if (selectedItem.equals("CHAT")) {
+		} else if (selectedItem.equals("WIFI")) {
 			activity.showChat();
 		}
 	}
